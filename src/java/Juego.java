@@ -80,7 +80,7 @@ public class Juego extends HttpServlet {
         String CONTENT_TYPE = "text/html";
         String Encabezado = "";
         int numero;
-        String nombre, password;
+        String nombre, password, n, num = "Numero";
         response.setContentType(CONTENT_TYPE);
         ServletOutputStream out = response.getOutputStream();
         Integer AccesosInt = new Integer(0);
@@ -115,7 +115,7 @@ public class Juego extends HttpServlet {
             
             out.println("<form id=" + "form1" + "name=" + "form1" + "method=" + "post"  + "action=" + "Juego" + ">");
             out.println("<div>INTRODUZCA UN NÚMERO: </div>");
-            out.println("<input type=" + "number" + "size=" + "15" + "maxlength=" + "30" + "value=" + "Número" + "name=" + "nombre"+ ">");
+            out.println("<input type=" + "number" + "size=" + "15" + "maxlength=" + "30" + "value=" + num+ "name=" + "n"+ ">");
             out.println("<input type=" + "submit" + "name=" + "Submit" + "value=" + "Jugar" + "/>");
             out.println("</form>");
             
