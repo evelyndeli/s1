@@ -6,7 +6,9 @@
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -58,6 +60,8 @@ public class Juego extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
+        
+        
     }
 
     /**
@@ -71,7 +75,83 @@ public class Juego extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        //processRequest(request, response);
+        
+        String CONTENT_TYPE = "text/html";
+        String Encabezado = "";
+        int numero;
+        String nombre, password;
+        response.setContentType(CONTENT_TYPE);
+        ServletOutputStream out = response.getOutputStream();
+        Integer AccesosInt = new Integer(0);
+        nombre = request.getParameter("nombre");
+        if (nombre == null) {
+        nombre = ""; }
+        password = request.getParameter("password");
+        if (password == null) {
+        password = ""; }
+        
+        // recuperar la sesión
+        javax.servlet.http.HttpSession sesion = request.getSession(true);
+        if (sesion.isNew()) { // la sesión es nueva
+            Encabezado = "Bienvenido"; 
+            numero = (int) (Math.random() * 100) + 1;
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>SESIONES");
+            out.println("</title>");
+            out.println("<BODY BGCOLOR=\"#FDF5E6\">");
+            out.println("<H1 ALIGN=\"CENTER\">" + Encabezado + "</H1>");
+            out.println("<H2 ALIGN=\"CENTER\">Instrucciones del juego:</H2>");
+            
+            out.println("<TABLE BORDER=1 ALIGN=CENTER>");
+            out.println("<IN BGCOLOR=\"#FFAD00\">");
+            //out.println("<TR BGCOLOR=\"#FFAD00\">");
+            out.println("<TH>El adversario escogerá un número entre 1 y 100 y el usuario debe"
+                    + " intentar adivinarlo introduciendo un número entre 1 y 100 en la casilla. El adversario"
+                    + " le informará de si ha acertado, y si no le dará una pista.");
+            out.println("</TABLE>");
+            out.println("</BODY></HTML>");
+            
+            out.println("<form id=" + "form1" + "name=" + "form1" + "method=" + "post"  + "action=" + "Juego" + ">");
+            out.println("<div>INTRODUZCA UN NÚMERO: </div>");
+            out.println("<input type=" + "number" + "size=" + "15" + "maxlength=" + "30" + "value=" + "Número" + "name=" + "nombre"+ ">");
+            out.println("<input type=" + "submit" + "name=" + "Submit" + "value=" + "Jugar" + "/>");
+            out.println("</form>");
+            
+            out.close();
+        }
+        else {
+        Encabezado = "Has vuelto";
+        Integer AccesosViejo = (Integer) sesion.getAttribute("Accesos");
+        if (AccesosViejo != null) {
+        AccesosInt = new Integer(AccesosViejo.intValue() + 1); }
+        }
+        sesion.setAttribute("Accesos", AccesosInt);
+        
+        
+        /*out.println("<TABLE BORDER=1 ALIGN=CENTER>");
+        out.println("<TR BGCOLOR=\"#FFAD00\">");
+        out.println("<TH>Tipo <TH>Valor");
+        out.println("<TR><TD>ID");
+        out.println("<TD>" + sesion.getId());
+        out.println("<TR><TD>Tiempo de creacion");
+        out.println("<TD>" + new Date(sesion.getCreationTime()));
+        out.println("<TR><TD>Tiempo de acceso");
+        out.println("<TD>" + new Date(sesion.getLastAccessedTime()));
+        out.println("<TR><TD>Numero de accesos previos");
+        out.println("<TD>" + (Integer) sesion.getAttribute("Accesos"));
+        out.println("<TR><TD>Login");
+        String Login = request.getParameter("login");
+        sesion.setAttribute("Login", Login);
+        out.println("<TD>" + Login);
+        out.println("<TR><TD>Password");
+        String Password = request.getParameter("password");
+        sesion.setAttribute("Password", Password);
+        out.println("<TD>" + Password);
+        out.println("</TABLE>");
+        out.println("</BODY></HTML>");
+        out.close();*/
     }
 
     /**
