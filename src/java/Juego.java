@@ -6,7 +6,7 @@
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Date;
+import java.util.Objects;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
@@ -79,18 +79,21 @@ public class Juego extends HttpServlet {
         
         String CONTENT_TYPE = "text/html";
         String Encabezado = "";
-        int numero, numeroaleat = 0, n = 0;
+        int numero, i;
         String nombre, num = "Numero";
         response.setContentType(CONTENT_TYPE);
         ServletOutputStream out = response.getOutputStream();
-        Integer AccesosInt = new Integer(0);
+        Integer n = new Integer(0);
+        Integer intentos = new Integer(1);
         nombre = request.getParameter("nombre");
+        //n = Integer.valueOf(request.getParameter("tunumero"));
         if (nombre == null) {
         nombre = ""; }
         
         // recuperar la sesión
         javax.servlet.http.HttpSession sesion = request.getSession(true);
         if (sesion.isNew()) { // la sesión es nueva
+
             Encabezado = "Bienvenido"; 
             numero = (int) (Math.random() * 100) + 1;
             sesion.setAttribute("numeroaleat", numero);
@@ -103,64 +106,87 @@ public class Juego extends HttpServlet {
             out.println("<H2 ALIGN=\"CENTER\">Instrucciones del juego:</H2>");
             
             out.println("<TABLE BORDER=1 ALIGN=CENTER>");
-            out.println("<IN BGCOLOR=\"#FFAD00\">");
+            out.println("<IN BGCOLOR=\"#E6E6FA\">");
             out.println("<TH>El adversario escogerá un número entre 1 y 100 y el usuario debe"
                     + " intentar adivinarlo introduciendo un número entre 1 y 100 en la casilla. El adversario"
-                    + " le informará de si ha acertado, y si no le dará una pista.");
+                    + " le informará de si ha acertado, y si no le dará una pista." + numero);
             out.println("</TABLE>");
             
             out.println("<form id='form1' name='form1' method='post' action='Juego'>");
             out.println("<div>INTRODUZCA UN NÚMERO: </div>");
+            out.println("<input type='hidden' name= 'intentos' value='intentos'/>");
             out.println("<input type='hidden' name= 'nombre' value='nombre'/>");
             out.println("<input type='hidden' name= 'numeroaleat' value='numero'/>");
-            out.println("<input type='number' size='15' maxlength='30' value='Numero' name= 'n'>");
+            /*String opcion = "";
+            String option = request.getParameter("tunumero");
+            for (i = 1; i <= 100; i++)
+            {
+                opcion =  opcion + "<option value=\""+ i +"\">"+ i +"</option>\n";
+            }
+            
+            out.println("<div ALIGN=\"CENTER\"> <select name=\"tunumero\"> \n"
+                    + opcion 
+                    + "</select></div>");
+            out.println("<br>");
+            out.println("<div ALIGN=\"CENTER\"><p>" + option + "</p></div>");*/
+            out.println("<input type='number' size='15' maxlength='30' name='tunumero' value= 'n'/>");
             out.println("<input type='submit' name= 'Submit' value='Jugar'/>");
             out.println("</form>");
             out.println("</BODY></HTML>");
             
             sesion.setAttribute("tunumero", n);
             sesion.setAttribute("nombre", nombre);
+            sesion.setAttribute("intentos", intentos);
             
             out.close();
         }
         else {
             
-            if(((Integer)sesion.getAttribute("tunumero") == (Integer)sesion.getAttribute("numeroaleat"))){
+            if(Objects.equals((Integer)sesion.getAttribute("tunumero"), (Integer)sesion.getAttribute("numeroaleat"))){
                 Encabezado = "¡Felicidades "  + sesion.getAttribute("nombre") + "!"; 
                 out.println("<html>");
                 out.println("<head>");
                 out.println("<title>Numero Correcto");
                 out.println("</title>");
+                out.println("<H2 ALIGN=\"CENTER\">Intentos = " + (Integer)sesion.getAttribute("intentos") + "</H2>");
                 out.println("<BODY BGCOLOR=\"#FDF5E6\">");
                 out.println("<H1 ALIGN=\"CENTER\">" + Encabezado + "</H1>");
                 out.println("<a href = 'inicio.html'> Ir al enlace </a>");
                 out.println("</BODY></HTML>");
             }
             else{
-                Encabezado = "No has acertado!"; 
-                numero = (int) (Math.random() * 100) + 1;
+                
+                Encabezado = "No has acertado! " + sesion.getAttribute("nombre"); 
                 out.println("<html>");
                 out.println("<head>");
                 out.println("<title>Numero Aleatorio");
                 out.println("</title>");
                 out.println("<BODY BGCOLOR=\"#FDF5E6\">");
                 out.println("<H1 ALIGN=\"CENTER\">" + Encabezado + "</H1>");
-                out.println("<H2 ALIGN=\"CENTER\">Instrucciones del juego:</H2>");
+                out.println("<H2 ALIGN=\"CENTER\">Pista:</H2>");
 
                 out.println("<TABLE BORDER=1 ALIGN=CENTER>");
                 out.println("<IN BGCOLOR=\"#FFAD00\">");
-                out.println("<TH>El adversario escogerá un número entre 1 y 100 y el usuario debe"
-                        + " intentar adivinarlo introduciendo un número entre 1 y 100 en la casilla. El adversario"
-                        + " le informará de si ha acertado, y si no le dará una pista.");
+                
+                if((Integer)sesion.getAttribute("tunumero") > (Integer)sesion.getAttribute("numeroaleat"))
+                    out.println("<TH>El numero escondido es mas pequeño que " + (Integer)sesion.getAttribute("tunumero"));
+                else
+                    out.println("<TH>El numero escondido es mayor que " + (Integer)sesion.getAttribute("tunumero") + (Integer)sesion.getAttribute("numeroaleat"));
+                    
                 out.println("</TABLE>");
 
                 out.println("<form id='form1' name='form1' method='post' action='Juego'>");
                 out.println("<div>INTRODUZCA UN NÚMERO: </div>");
                 out.println("<input type='hidden' name= 'nombre' value='nombre'/>");
-                out.println("<input type='number' size='15' maxlength='30' value='Numero' name= 'n'>");
+                out.println("<input type='number' size='15' maxlength='30' value='tunumero' name= 'tunumero'>");
                 out.println("<input type='submit' name= 'Submit' value='Jugar'/>");
                 out.println("</form>");
                 out.println("</BODY></HTML>");
+                
+                intentos++;
+                
+                sesion.setAttribute("intentos", intentos);
+                sesion.setAttribute("tunumero", n);
             }
             
         }
